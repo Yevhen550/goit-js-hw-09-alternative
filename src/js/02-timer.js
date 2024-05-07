@@ -2,7 +2,6 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
 
-// const inputEl = document.getElementById('datetime-picker');
 const startBtn = document.querySelector('[data-start]');
 const stopBtn = document.querySelector('[data-stop]');
 const daysEl = document.querySelector('[data-days]');
@@ -10,7 +9,7 @@ const hoursEl = document.querySelector('[data-hours]');
 const minytesEl = document.querySelector('[data-minutes]');
 const secondsEl = document.querySelector('[data-seconds]');
 
-const currentDate = Date.now();
+let timerId = null;
 
 startBtn.disabled = true;
 stopBtn.disabled = true;
@@ -21,43 +20,41 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const focusDate = new Date(selectedDates[0]);
-    const timeLeft = focusDate - currentDate;
-    const userDate = convertMs(timeLeft);
-
-    if (focusDate <= currentDate) {
+    if (selectedDates[0] <= Date.now()) {
       Notiflix.Notify.failure('Please choose a date in the future');
     } else {
       startBtn.disabled = false;
-      daysEl.textContent = userDate.days;
-      hoursEl.textContent = userDate.hours;
-      minytesEl.textContent = userDate.minutes;
-      secondsEl.textContent = userDate.seconds;
+      startBtn.addEventListener('click', startInterval);
     }
   },
 };
 
-flatpickr('#datetime-picker', options);
+const flatObj = flatpickr('#datetime-picker', options);
 
-startBtn.addEventListener('click', startInterval);
 stopBtn.addEventListener('click', stopInterval);
 
-const timerId = setInterval(timer, 1000);
-console.log(timerId);
-
 function startInterval() {
-  startBtn.disabled = false;
+  startBtn.disabled = true;
   stopBtn.disabled = false;
-  console.log('lol');
+
+  timerId = setInterval(timer, 1000);
 }
 
 function timer() {
-  console.log('yes');
+  const selectDate = flatObj.selectedDates[0];
+  const timeLeft = selectDate.getTime() - Date.now();
+  const userDate = convertMs(timeLeft);
+
+  daysEl.textContent = userDate.days;
+  hoursEl.textContent = userDate.hours;
+  minytesEl.textContent = userDate.minutes;
+  secondsEl.textContent = userDate.seconds;
 }
 
 function stopInterval() {
-  console.log('stop interval');
   clearInterval(timerId);
+
+  startBtn.disabled = false;
   stopBtn.disabled = true;
 }
 
@@ -67,15 +64,16 @@ function convertMs(ms) {
   const hour = minute * 60;
   const day = hour * 24;
 
-  const days = Math.floor(ms / day);
-  const hours = Math.floor((ms % day) / hour);
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  const days = addLeadingZero(Math.floor(ms / day));
+  const hours = addLeadingZero(Math.floor((ms % day) / hour));
+  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+  const seconds = addLeadingZero(
+    Math.floor((((ms % day) % hour) % minute) / second)
+  );
 
   return { days, hours, minutes, seconds };
 }
 
-// Notiflix.Notify.failure('Please choose a date in the future');
-// Notiflix.Notify.success('Sol lucet omnibus');
-// Notiflix.Notify.warning('Memento te hominem esse');
-// Notiflix.Notify.info('Cogito ergo sum');
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
