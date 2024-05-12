@@ -2,6 +2,9 @@ import Notiflix from 'notiflix';
 
 const form = document.querySelector('.form');
 const btnSubmit = document.querySelector('button');
+const delayInput = document.querySelector('[name="delay"]');
+const stepDelayInput = document.querySelector('[name="step"]');
+const amountInput = document.querySelector('[name="amount"]');
 
 //*****************==========================================================================
 //*
@@ -11,14 +14,28 @@ const btnSubmit = document.querySelector('button');
 //*  введену користувачем, і крок(step).
 //*
 //*****************===========================================================================
-// function createPromise(position, delay) {
-//   const shouldResolve = Math.random() > 0.3;
-//   if (shouldResolve) {
-//     // Fulfill
-//   } else {
-//     // Reject
-//   }
-// }
+
+form.addEventListener('submit', createPromise);
+
+function createPromise(position, delay) {
+  return new Promise((resolve, reject) => {
+    const shouldResolve = Math.random() > 0.3;
+    setInterval(() => {
+      if (shouldResolve) {
+        resolve('✅ Fulfilled');
+      } else {
+        reject('❌ Rejected');
+      }
+    }, delay);
+  });
+}
+
+createPromise(2, 1500)
+  .then(res => console.log(res))
+  .catch(rej => console.log(rej));
+
+// console.log('%c color:red', 'color:red; font-size:30px;');
+
 //*==========================================================================================
 //*
 //*   Доповни код функції createPromise таким чином, щоб вона повертала один проміс,
@@ -38,6 +55,3 @@ const btnSubmit = document.querySelector('button');
 
 // Notiflix.Notify.failure('Qui timide rogat docet negare');
 // Notiflix.Notify.info('Cogito ergo sum');
-
-// Change value of isSuccess variable to call resolve or reject
-// Change value of isSuccess variable to call resolve or reject
