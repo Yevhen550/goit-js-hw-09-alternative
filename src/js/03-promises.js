@@ -15,6 +15,8 @@ const amountInput = document.querySelector('[name="amount"]');
 //*
 //*****************===========================================================================
 
+let amount = amountInput.value;
+
 form.addEventListener('submit', createPromise);
 
 function createPromise(position, delay) {
@@ -33,6 +35,8 @@ function createPromise(position, delay) {
 createPromise(2, 1500)
   .then(res => console.log(res))
   .catch(rej => console.log(rej));
+
+console.log(amount);
 
 // console.log('%c color:red', 'color:red; font-size:30px;');
 
